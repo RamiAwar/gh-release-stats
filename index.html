@@ -1,47 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Release Tracker</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">GitHub Release Tracker</h1>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="p-6">
-                <div class="flex space-x-4 mb-6">
-                    <input type="text" id="repoInput" placeholder="ramiawar/dataline" class="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <button onclick="trackReleases()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Track Releases</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GitHub Release Tracker</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">GitHub Release Tracker</h1>
+            <div class="flex space-x-4 mb-6 justify-center">
+                <input
+                    type="text"
+                    id="repoInput"
+                    placeholder="ramiawar/dataline"
+                    class="flex-shrink px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                <button onclick="trackReleases()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Track Releases</button>
+            </div>
+            <div id="chartSection" class="mb-8 hidden flex flex-col">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Downloads per Latest Releases</h2>
+                <div class="p-4 max-h-96 max-w-7xl bg-white border border-gray-300 rounded-md">
+                    <canvas id="releaseChart"></canvas>
                 </div>
-                <div id="chartSection" class="mb-8 hidden">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Downloads per Release</h2>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <canvas id="releaseChart"></canvas>
-                    </div>
+            </div>
+            <div id="tableSection" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Release Data</h2>
+                    <button onclick="exportToCSV()" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Export to CSV</button>
                 </div>
-                <div id="tableSection" class="hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900">Release Data</h2>
-                        <button onclick="exportToCSV()" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Export to CSV</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table id="releaseTable" class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Release Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tag</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Downloads</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Downloads</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200"></tbody>
-                        </table>
-                    </div>
+                <div class="overflow-x-auto overflow-y-scroll rounded-md border border-gray-300 max-h-96">
+                    <table id="releaseTable" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Release Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tag</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Downloads</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -91,7 +93,8 @@
         }
 
         function updateChart(data) {
-            const releaseLabels = data.map(r => r.tagName).reverse();
+            const lastN = 6;
+            const releaseLabels = data.map(r => r.tagName).reverse().slice(-lastN);
             const allAssetNames = [...new Set(data.flatMap(release => release.assets.map(asset => asset.name)))];
 
             const datasets = allAssetNames.map((assetName, index) => ({
@@ -99,14 +102,14 @@
                 data: data.map(release => {
                     const asset = release.assets.find(a => a.name === assetName);
                     return asset ? asset.downloadCount : 0;
-                }).reverse(),
+                }).reverse().slice(-lastN),
                 borderColor: `hsl(${index * 137.508}deg, 70%, 50%)`,
                 fill: false
             }));
 
             datasets.unshift({
                 label: 'Total Downloads',
-                data: data.map(release => release.totalDownloads).reverse(),
+                data: data.map(release => release.totalDownloads).reverse().slice(-lastN),
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
@@ -123,6 +126,7 @@
                 data: { labels: releaseLabels, datasets },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: { 
                         y: { 
                             beginAtZero: true,
@@ -148,6 +152,10 @@
                         }
                     }
                 }
+            });
+
+            window.addEventListener('resize', function() {
+                chart.resize();
             });
         }
 
@@ -225,5 +233,4 @@
         }
     </script>
 </body>
-
 </html>
